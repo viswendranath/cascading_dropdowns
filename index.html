@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+
+            var drops = $("select").filter("[class^='drop']");
+            var r0 = new RegExp('[:alnum:]*drop-0[:alnum:]*');
+            drops.each(function (i) {
+                if (!$(this).attr("class").match(r0)) {
+                    $(this).prop("disabled", true);
+                }
+            });
+
+            drops.each(function () {
+                $(this).change(function () {
+                    var value = $(this).attr("id");
+                    if (!value.match(new RegExp('-0$'))) {
+                        var qno = value.split("-")[0];
+                        console.log('Question no : ' + qno);
+                        // alert(qno);
+                        // get all the selects with qno
+                        var quesDropDowns = $("select").filter('[id^="' + qno + '-"]');
+                        console.log('Q: ' + qno + '\'s no. of dropdown lists : ' + quesDropDowns.length);
+                        // alert(quesDropDowns.length);
+                        // enable the first disabled select
+                        // alert($(this).attr('id'));
+                        var i = parseInt( $(this).attr('id').split("-")[1] );
+                        console.log('Q: ' + qno + "'s dropdown " + i + " changed");
+
+                        if(i < quesDropDowns.length){
+                            console.log('Q: ' + qno + "'s dropdown " + (i+1) + " enabled");
+                            document.getElementById(qno+"-"+(i+1)).disabled = false;
+
+                        }
+                        
+                        for(var j=i+2;j<=quesDropDowns.length;j++){
+                            // alert(j);
+                            document.getElementById(qno+"-"+j).selectedIndex = 0;
+                            document.getElementById(qno+"-"+j).disabled = true;
+                        }
+                        
+                        var quesOptions = $("option[id^="+ qno + "-" + (i+1) + "-]");
+                        console.log('Q: '+ qno + "'s options selected and got length as " + quesOptions.length);
+                        // alert(i);
+                        quesOptions.each(function (){
+                            $(this).attr('hidden',true);
+                            console.log('Q: ' + qno + '\'s dropdown ' + (i+1) + ' all options are set to hidden');
+                        });
+                        // alert($('select[id="'+ qno + '-' + i + '"] option').filter(":selected").attr('id'));
+                        console.log('Q: ' + qno + ' ' + $('select[id="'+ qno + '-' + i + '"] option').filter(":selected").attr('id') + ' selected')
+
+                        quesOptions.each(function (){
+                            if($(this).attr("dependOn") === $('select[id="'+ qno + '-' + i + '"] option').filter(":selected").attr('id')
+                            || $(this).attr('id').match(new RegExp('-0$'))
+                            ){
+                                // alert($(this).attr('id'));
+                                $(this).attr('hidden',false);
+                            }
+                        });
+                        document.getElementById(qno+"-"+(i+1)).selectedIndex = 0;
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <h1>Hello</h1>
+    <div id="1">
+
+        <select name="1-1" id="1-1" class="drop-0">
+
+            <option id="1-1-0">-- select --</option>
+            <option id="1-1-1">First</option>
+            <option id="1-1-2">Second</option>
+            <option id="1-1-3">Third</option>
+
+        </select>
+        <select name="1-2" id="1-2" class="drop-1">
+
+            <option id="1-2-0">-- select --</option>
+
+            <option id="1-2-1" dependOn='1-1-1'>One</option>
+            <option id="1-2-2" dependOn='1-1-1'>One 1</option>
+            <option id="1-2-3" dependOn='1-1-1'>One 2</option>
+            
+            <option id="1-2-4" dependOn='1-1-2'>Two</option>
+            <option id="1-2-5" dependOn='1-1-2'>Two 1</option>
+            <option id="1-2-6" dependOn='1-1-2'>Two 2</option>
+
+            <option id="1-2-7" dependOn='1-1-3'>Three</option>
+            <option id="1-2-8" dependOn='1-1-3'>Three 1</option>
+            <option id="1-2-9" dependOn='1-1-3'>Three 2</option>
+        </select>
+    </div>
+    <div id="3">
+
+        <select name="3-1" id="3-1" class="drop-0">
+
+            <option id="3-1-0">-- select --</option>
+            <option id="3-1-1">First</option>
+            <option id="3-1-2">Second</option>
+            <option id="3-1-3">Third</option>
+
+        </select>
+        <select name="3-2" id="3-2" class="drop-1">
+
+            <option id="3-2-0">-- select --</option>
+
+            <option id="3-2-1" dependOn='3-1-1'>One</option>
+            <option id="3-2-2" dependOn='3-1-1'>One 1</option>
+            <option id="3-2-3" dependOn='3-1-1'>One 2</option>
+
+            <option id="3-2-4" dependOn='3-1-2'>Two</option>
+            <option id="3-2-5" dependOn='3-1-2'>Two 1</option>
+            <option id="3-2-6" dependOn='3-1-2'>Two 2</option>
+
+            <option id="3-2-7" dependOn='3-1-3'>Three</option>
+            <option id="3-2-8" dependOn='3-1-3'>Three 1</option>
+            <option id="3-2-9" dependOn='3-1-3'>Three 2</option>
+        </select>
+        <select name="3-3" id="3-3" class="drop-1">
+
+            <option id="3-3-0">-- select --</option>
+
+            <option id="3-3-1" dependOn='3-2-2'>One 1 D1</option>
+            <option id="3-3-2" dependOn='3-2-2'>One 1 D2</option>
+            <option id="3-3-3" dependOn='3-2-2'>One 2 D3</option>
+
+            <option id="3-3-4" dependOn='3-2-6'>Two 2 D1</option>
+            <option id="3-3-5" dependOn='3-2-6'>Two 2 D2</option>
+            <option id="3-3-6" dependOn='3-2-6'>Two 2 D3</option>
+            <option id="3-3-7" dependOn='3-2-6'>Two 2 D3</option>
+
+            <option id="3-3-8" dependOn='3-2-7'>Three D1</option>
+            <option id="3-3-9" dependOn='3-2-7'>Three D2</option>
+            <option id="3-3-10" dependOn='3-2-7'>Three D3</option>
+        </select>
+    </div>
+</body>
+
+</html>
